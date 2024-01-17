@@ -1,3 +1,12 @@
+# File or Class name: input_validator.py
+# Program author(s): Anuj Dwivedi
+# Course number and title: COSC4603 - Computer Theory
+# Assignment number and name: Assignment #0 - Regular Expression Character Checker
+# Due date: 17th January 2024
+# Brief description of the purpose of the program::
+#   This Python program validates user-input regular expressions for characters {a, b, /, *, (, )}.
+
+
 
 #the complete code plus readme posted to github
 """Github : https://github.com/ANUJDWIVDI/inputvalidator_assign """
