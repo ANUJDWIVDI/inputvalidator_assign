@@ -13,7 +13,6 @@ flag=0 #to act as a flag variable to indicate validity of expression
 
 input_string = input("Enter regular expression.:")
 
-print(input_string)
 result='' #to store the valid or invalid string chain
 result2='' #to act as the second line of chain with ^ pointer
 
