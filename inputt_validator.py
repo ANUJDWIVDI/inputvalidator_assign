@@ -1,3 +1,8 @@
+
+#the complete code plus readme posted to github
+"""Github : https://github.com/ANUJDWIVDI/inputvalidator_assign """
+
+
 def valid(char): #func defined to check if character is within language
     if char in ['a','b','*','/','(',')']:
         return 1
@@ -22,7 +27,6 @@ for x in input_string :
             result += x
             result2 += '^'
     elif x == '\t': #for tab case entered
-        print("1")
         for y in range(4):
             result += ' '
             result2 += ' '
