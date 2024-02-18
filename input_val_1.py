@@ -112,7 +112,7 @@ def valid(char):
 
 print("Enter a Regular exp! , Type 'exit' to quit: ")
 
-input_strings = []  # A list to store the range of expressions whose validity is to be determined.
+input_strings = []  # A list to store the range of regular expressions whose validity is to be determined.
 
 while True:
     input_string = input()
@@ -137,7 +137,7 @@ for exp in input_strings:
     next_char = exp[0]
 
 
-    def get_next_char():
+    def get_next_char():  # Function that helps fetch the preceeding character .
         global index, next_char
         if (index + 1) < len(exp):
             index = index + 1
@@ -164,18 +164,14 @@ for exp in input_strings:
             result += ' '
             result2 += ' '
 
-
     index = 0  # Resets the index for each input string
     next_char = exp[0]  # Resets the next character for each input string
-
-
 
     if not S(exp):
         print(f"INVALID: {exp}")
         if not result2.isspace():
-            print("        ", result2,"\t\t\t Invalid Symbols Used")
+            print("        ", result2, "\t\t\t Invalid Symbols Used")
         else:
             print("\t\t\t\t\t\tInvalid Due to Incorrect Grammar Use")
     else:
         print(f"VALID: {exp}")
-
