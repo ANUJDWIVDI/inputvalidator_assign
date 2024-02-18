@@ -132,8 +132,6 @@ def Q(input_string, adjacency_matrix):
 
 
 
-
-
 # Function to add a new state to the adjacency matrix
 def add_state(adjacency_matrix):
     state_name = str(len(adjacency_matrix))
