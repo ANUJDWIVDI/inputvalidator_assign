@@ -5,6 +5,10 @@ def S(input_string, adjacency_matrix):
     initial_state = '0'
     adjacency_matrix[initial_state] = {}  # Initializing adjacency matrix with start state '0'
 
+    if len(input_string) > 1000:
+        print("Input string exceeds 1000 characters.")
+        return False
+
     # Parse the regular expression
     if not T(input_string, initial_state, adjacency_matrix):
         return False
