@@ -1,0 +1,96 @@
+# Initialize variables for storing states and the transition table
+states = []
+transition_table = {}
+
+# Function to ensure transition table has the required dimensions
+def ensure_transition_table(state_count):
+    for state in range(state_count):
+        if state not in transition_table:
+            transition_table[state] = {}
+
+# Concatenation machine: Takes two states and creates a transition between them.
+def concat_machine(from_state, to_state, transition_value):
+    ensure_transition_table(max(from_state, to_state) + 1)
+    transition_table[from_state][transition_value] = to_state
+
+# Epsilon transition: Takes two states and creates an epsilon transition between them.
+def epsilon_transition(from_state, to_state):
+    ensure_transition_table(max(from_state, to_state) + 1)
+    transition_table[from_state]['eps'] = to_state
+
+# Kleene closure machine: Adds epsilon transitions from the original accept state to the original start state and to a new accept state,
+# and from a new start state to the original start state and the new accept state.
+def kleene_machine(start_state, accept_state):
+    ensure_transition_table(start_state + 1)
+    ensure_transition_table(accept_state + 1)
+    transition_table[start_state]['eps'] = accept_state
+    transition_table[start_state]['eps'] = start_state + 1
+    transition_table[accept_state]['eps'] = accept_state + 1
+    transition_table[accept_state]['eps'] = start_state
+
+# Function to print the transition table
+def print_transition_table(transition_table):
+    # Create header
+    header = "State\tTransition\tNext State"
+    print(header)
+    print("-" * len(header.expandtabs()))
+
+    # Print rows
+    for state, transitions in transition_table.items():
+        for transition, next_state in transitions.items():
+            print(f"{state}\t{transition}\t\t{next_state}")
+
+# Function to check if a string is accepted by the NFA machine
+def is_accepted_by_nfa(input_string):
+    current_states = set([0])  # Start from the initial state
+    for char in input_string:
+        next_states = set()
+        for state in current_states:
+            if state in transition_table and char in transition_table[state]:
+                next_states.add(transition_table[state][char])
+            if 'eps' in transition_table[state]:
+                next_states.add(transition_table[state]['eps'])
+        current_states = next_states
+    return any(state in current_states for state in accept_states)  # Check if any final state is reached
+
+# Regular expression input
+regex = input("Enter a Regular expression: ")
+
+# Parse the regular expression
+index = 0
+current_state = 0
+start_state = 0
+accept_states = set()
+for i, char in enumerate(regex):
+    if char == '(':
+        current_state += 1
+        concat_machine(current_state - 1, current_state, 'eps')
+    elif char == ')':
+        current_state += 1
+        concat_machine(current_state - 1, current_state, 'eps')
+    elif char == '|':
+        epsilon_transition(start_state, current_state)
+        current_state = start_state
+    elif char == '*':
+        kleene_machine(start_state, current_state)
+    else:
+        current_state += 1
+        concat_machine(current_state - 1, current_state, char)
+        if i + 1 < len(regex) and regex[i + 1] != '*' and regex[i + 1] != ')' and regex[i + 1] != '|':
+            current_state += 1
+            concat_machine(current_state - 1, current_state, 'eps')
+
+accept_states.add(current_state)  # Mark the last state as an accept state
+
+# Print the transition table
+print("\nTransition Table:")
+print_transition_table(transition_table)
+
+# Input string to check
+input_string = input("Enter a string to check if it is accepted by the NFA machine: ")
+
+# Check if the input string is accepted by the NFA machine
+if is_accepted_by_nfa(input_string):
+    print(f"The string '{input_string}' is accepted by the NFA machine.")
+else:
+    print(f"The string '{input_string}' is not accepted by the NFA machine.")

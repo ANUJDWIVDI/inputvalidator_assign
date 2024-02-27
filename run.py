@@ -13,6 +13,15 @@
 
 """ Set of Functions S,E,T,F,Q,R,U That denote the given state and if Grammar rules are being followed"""
 
+nextAvailable = 0
+stateStk = []
+adjMat = []
+for i in range(50):
+    adjMat.append([])
+for i in adjMat:
+    for k in range(50):
+        i.append("")
+
 
 def S(exp):
     global index
@@ -47,8 +56,11 @@ def T(exp):
 
 
 def F(exp):
-    global index
+    global index, nextAvailable, stateStk, adjMat
     if index < len(exp) and exp[index] in ('a', 'b'):
+        adjMat[nextAvailable][nextAvailable + 1] += exp[index]
+        stateStk.append([nextAvailable, nextAvailable + 1])
+        nextAvailable += 2
         index += 1
         if not U(exp):
             return False
@@ -68,11 +80,22 @@ def F(exp):
 
 
 def Q(exp):
-    global index
-    if index < len(exp) and exp[index] == '|':
+    global index, nextAvailable, stateStk ,adjMat
+    if index < len(exp) and exp[index] == '+':
         index += 1
         if not T(exp):
             return False
+        # building the or machine
+        temp1 = stateStk.pop()
+        temp2 = stateStk.pop()
+
+        adjMat[nextAvailable][temp2[0]] += 'e'
+        adjMat[nextAvailable][temp1[0]] += 'e'
+        adjMat[temp2[1]][nextAvailable + 1] += 'e'
+        adjMat[temp1[1]][nextAvailable + 1] += 'e'
+        stateStk.append([nextAvailable, nextAvailable + 1])
+        nextAvailable += 2
+
         if not Q(exp):
             return False
         return True
@@ -80,10 +103,19 @@ def Q(exp):
 
 
 def R(exp):
-    global index
+    global index, nextAvailable, adjMat, stateStk
     if index < len(exp) and exp[index] in ('(', 'a', 'b'):
         if not F(exp):
             return False
+        temp1 = stateStk.pop()
+        temp2 = stateStk.pop()
+
+        adjMat[temp2[1]][temp1[0]] += 'e'
+        #adjMat[temp1[1]][nextAvailable + 1] += 'e'
+        #adjMat[nextAvailable][temp2[0]] += 'e'
+        stateStk.append([temp2[0],temp1[1]])
+
+
         if not R(exp):
             return False
         return True
@@ -91,12 +123,17 @@ def R(exp):
 
 
 def U(exp):
-    global index
+    global index, nextAvailable, stateStk , adjMat
     if index < len(exp) and exp[index] == '*':
         index += 1
-        if not U(exp):
-            return False
-        return True
+        # build kleene machine
+        popped = stateStk.pop()
+        adjMat[nextAvailable][popped[0]] += 'e'
+        adjMat[nextAvailable][nextAvailable + 1] += 'e'
+        adjMat[popped[1]][nextAvailable + 1] += 'e'
+        stateStk.append([nextAvailable, nextAvailable + 1])
+        nextAvailable += 2
+        U(exp)
     return True
 
 
@@ -104,7 +141,7 @@ def U(exp):
 
 
 def valid(char):
-    if char in ['a', 'b', '*', '(', ')', '|', '$']:
+    if char in ['a', 'b', '*', '(', ')', '|', '$','+']:
         return 1
     else:
         return 0
@@ -114,21 +151,14 @@ print("Enter a Regular exp! , Type 'exit' to quit: ")
 
 input_strings = []  # A list to store the range of regular expressions whose validity is to be determined.
 
-while True:
-    input_string = input()
-
-    if input_string.lower() == 'exit':
-        print("\n----------------- RESULT ----------------------\n")
-        print("\n-----VALIDITY ---   |     --------REASON----\n")
-        break  # Exit the loop only if user enters the word 'exit'
-
-    input_strings.append(input_string)
+input_string = input()
 
 flag = 0  # to act as a flag variable to indicate validity of expression
 result = ''  # to store the valid or invalid string chain
 result2 = ''  # to act as the second line of chain with ^ pointer
 
-for exp in input_strings:
+if True:
+    exp = input_string
     flag = 0
     result = ''
     result2 = ''
@@ -175,3 +205,24 @@ for exp in input_strings:
             print("\t\t\t\t\t\tInvalid Due to Incorrect Grammar Use")
     else:
         print(f"VALID: {exp}")
+        print("Expression Accepted")
+        height=0
+        for ind1,i in enumerate(adjMat):
+            a=[]
+            b=[]
+            e=[]
+            for ind2,k in enumerate(i):
+                if 'a' in k:
+                    a.append(ind2)
+                if 'b' in k:
+                    b.append(ind2)
+                if 'e' in k:
+                    e.append(ind2)
+            if not (a or b or e):
+                height=ind1 + 1
+                break
+            print(str(ind1)+'\t'+str(a)+'\t'+str(b)+'\t'+str(e))
+        print(str(ind1) + '\t' + str(a) + '\t' + str(b) + '\t' + str(e))
+        print("NFA States")
+        print("Start:",height - 2)
+        print("accept:",height-1)
